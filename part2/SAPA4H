@@ -1,0 +1,11 @@
+#jco.client.passwd=<< Existing password/certificate removed on export >>
+#
+#Sun Jan 26 11:24:26 UTC 2025
+Type=RFC
+jco.destination.auth_type=CONFIGURED_USER
+jco.client.sysnr=00
+jco.client.client=001
+jco.destination.proxy_type=OnPremise
+jco.client.user=SAPIPS
+Name=SAPA4H
+jco.client.ashost=sapa4h
