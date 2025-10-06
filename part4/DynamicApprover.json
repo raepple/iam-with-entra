@@ -1,0 +1,457 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "contentVersion": "1.0.0.0",
+        "triggers": {
+            "manual": {
+                "type": "Request",
+                "kind": "Http",
+                "inputs": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "AccessPackageAssignmentRequestId": {
+                                "type": "string"
+                            },
+                            "CallbackUriPath": {
+                                "type": "string"
+                            },
+                            "CustomExtensionStageInstanceId": {
+                                "type": "string"
+                            },
+                            "Stage": {
+                                "type": "string"
+                            },
+                            "RequestType": {
+                                "type": "string"
+                            },
+                            "Answers": {
+                                "type": "array"
+                            },
+                            "State": {
+                                "type": "string"
+                            },
+                            "Status": {
+                                "type": "string"
+                            },
+                            "CallbackConfiguration": {
+                                "type": "object",
+                                "properties": {
+                                    "DurationBeforeTimeout": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "AccessPackage": {
+                                "type": "object",
+                                "properties": {
+                                    "Id": {
+                                        "type": "string",
+                                        "description": "AccessPackage-Id"
+                                    },
+                                    "DisplayName": {
+                                        "type": "string",
+                                        "description": "AccessPackage-DisplayName"
+                                    },
+                                    "Description": {
+                                        "type": "string",
+                                        "description": "AccessPackage-Description"
+                                    }
+                                }
+                            },
+                            "AccessPackageCatalog": {
+                                "type": "object",
+                                "properties": {
+                                    "Id": {
+                                        "type": "string",
+                                        "description": "AccessPackageCatalog-Id"
+                                    },
+                                    "DisplayName": {
+                                        "type": "string",
+                                        "description": "AccessPackageCatalog-DisplayName"
+                                    },
+                                    "Description": {
+                                        "type": "string",
+                                        "description": "AccessPackageCatalog-Description"
+                                    }
+                                }
+                            },
+                            "Assignment": {
+                                "type": "object",
+                                "properties": {
+                                    "Id": {
+                                        "type": "string",
+                                        "description": "Assignment-Id"
+                                    },
+                                    "Target": {
+                                        "type": "object",
+                                        "properties": {
+                                            "ConnectedOrganization": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "Id": {
+                                                        "type": "string",
+                                                        "description": "Assignment-Target-ConnectedOrganization-Id"
+                                                    },
+                                                    "DisplayName": {
+                                                        "type": "string",
+                                                        "description": "Assignment-Target-ConnectedOrganization-DisplayName"
+                                                    },
+                                                    "Description": {
+                                                        "type": "string",
+                                                        "description": "Assignment-Target-ConnectedOrganization-Description"
+                                                    }
+                                                }
+                                            },
+                                            "Id": {
+                                                "type": "string",
+                                                "description": "Assignment-Target-Id"
+                                            },
+                                            "ObjectId": {
+                                                "type": "string",
+                                                "description": "Assignment-Target-ObjectId"
+                                            },
+                                            "DisplayName": {
+                                                "type": "string",
+                                                "description": "Assignment-Target-DisplayName"
+                                            }
+                                        }
+                                    },
+                                    "State": {
+                                        "type": "string",
+                                        "description": "Assignment-State"
+                                    },
+                                    "Status": {
+                                        "type": "string",
+                                        "description": "Assignment-Status"
+                                    },
+                                    "AssignmentPolicy": {
+                                        "type": "object",
+                                        "properties": {
+                                            "Id": {
+                                                "type": "string",
+                                                "description": "AssignmentPolicy-Id"
+                                            },
+                                            "DisplayName": {
+                                                "type": "string",
+                                                "description": "AssignmentPolicy-DisplayName"
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "Requestor": {
+                                "type": "object",
+                                "properties": {
+                                    "Id": {
+                                        "type": "string",
+                                        "description": "Requestor-Id"
+                                    },
+                                    "ObjectId": {
+                                        "type": "string",
+                                        "description": "Requestor-ObjectId"
+                                    },
+                                    "DisplayName": {
+                                        "type": "string",
+                                        "description": "Requestor-DisplayName"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "operationOptions": "IncludeAuthorizationHeadersInOutputs"
+            }
+        },
+        "actions": {
+            "Call_IAM_OData_Service": {
+                "runAfter": {
+                    "Parse_BTP_Token_Response": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Http",
+                "inputs": {
+                    "uri": "https://4478e7a5trial.it-cpitrial03-rt.cfapps.ap21.hana.ondemand.com/http/findapproverodata",
+                    "method": "POST",
+                    "headers": {
+                        "Accept": "application/json"
+                    },
+                    "body": {
+                        "companycode": "@{variables('company_code')}",
+                        "contexttype": "@{variables('context_type')}",
+                        "contextvalue": "@{variables('context_value')}"
+                    },
+                    "authentication": {
+                        "type": "Raw",
+                        "value": "Bearer @{body('Parse_BTP_Token_Response')?['access_token']}"
+                    }
+                },
+                "operationOptions": "DisableAutomaticDecompression"
+            },
+            "Get_request_context_type_from_request": {
+                "runAfter": {},
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "context_type",
+                            "type": "string",
+                            "value": "@triggerBody()?['Answers'][0]['Value']"
+                        }
+                    ]
+                }
+            },
+            "Get_request_context_value_from_request": {
+                "runAfter": {
+                    "Get_request_context_type_from_request": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "context_value",
+                            "type": "string",
+                            "value": "@triggerBody()?['Answers'][1]['Value']"
+                        }
+                    ]
+                }
+            },
+            "Get_company_code_from_request": {
+                "runAfter": {
+                    "Get_request_context_value_from_request": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "company_code",
+                            "type": "string",
+                            "value": "@triggerBody()?['Answers'][2]['Value']"
+                        }
+                    ]
+                }
+            },
+            "Parse_IAM_Service_Response": {
+                "runAfter": {
+                    "Set_IAM_service_response": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "ParseJson",
+                "inputs": {
+                    "content": " @{variables('IAMServiceResponse')}",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "IAMType": {
+                                "type": "object",
+                                "properties": {
+                                    "approveremail": {
+                                        "type": "string"
+                                    },
+                                    "IsActiveEntity": {
+                                        "type": "string"
+                                    },
+                                    "requestcontextvalue": {
+                                        "type": "string"
+                                    },
+                                    "companycode": {
+                                        "type": "string"
+                                    },
+                                    "requestcontexttype": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "Resolve_approver_email_to_ID": {
+                "runAfter": {
+                    "Parse_IAM_Service_Response": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Http",
+                "inputs": {
+                    "uri": "https://graph.microsoft.com/v1.0/users/@{body('Parse_IAM_Service_Response')?['IAMType']?['approveremail']}?$select=id,displayName",
+                    "method": "GET",
+                    "authentication": {
+                        "type": "ManagedServiceIdentity",
+                        "audience": "https://graph.microsoft.com"
+                    }
+                },
+                "runtimeConfiguration": {
+                    "contentTransfer": {
+                        "transferMode": "Chunked"
+                    }
+                }
+            },
+            "Request_access_token_from_BTP": {
+                "runAfter": {
+                    "Get_company_code_from_request": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Http",
+                "inputs": {
+                    "uri": "https://4478e7a5trial.authentication.ap21.hana.ondemand.com/oauth/token",
+                    "method": "POST",
+                    "queries": {
+                        "grant_type": "client_credentials"
+                    },
+                    "authentication": {
+                        "type": "Basic",
+                        "username": "sb-bc20dff3-c9b4-41a8-a3a1-7d0a7999aa2a!b57077|it-rt-4478e7a5trial!b196",
+                        "password": "d36c9286-e960-4840-924e-d528a6f414cf$Ixclf0sT1KQz2c1N6MVGCmxZm8A8eLW9sbqsE2Oof2A="
+                    }
+                },
+                "runtimeConfiguration": {
+                    "contentTransfer": {
+                        "transferMode": "Chunked"
+                    }
+                }
+            },
+            "Parse_BTP_Token_Response": {
+                "runAfter": {
+                    "Request_access_token_from_BTP": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "ParseJson",
+                "inputs": {
+                    "content": "@body('Request_access_token_from_BTP')",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "access_token": {
+                                "type": "string"
+                            },
+                            "token_type": {
+                                "type": "string"
+                            },
+                            "expires_in": {
+                                "type": "integer"
+                            },
+                            "scope": {
+                                "type": "string"
+                            },
+                            "jti": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "Set_IAM_service_response": {
+                "runAfter": {
+                    "Call_IAM_OData_Service": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "IAMServiceResponse",
+                            "type": "string",
+                            "value": "@{body('Call_IAM_OData_Service')}"
+                        }
+                    ]
+                }
+            },
+            "Parse_User_Graph_response": {
+                "runAfter": {
+                    "Resolve_approver_email_to_ID": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "ParseJson",
+                "inputs": {
+                    "content": "@body('Resolve_approver_email_to_ID')",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "@@odata.context": {
+                                "type": "string"
+                            },
+                            "id": {
+                                "type": "string"
+                            },
+                            "displayName": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "Resume_Approval_Stage_API_Call": {
+                "runAfter": {
+                    "Parse_User_Graph_response": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Http",
+                "inputs": {
+                    "uri": "https://graph.microsoft.com/beta@{triggerBody()?['CallbackUriPath']}",
+                    "method": "POST",
+                    "body": {
+                        "data": {
+                            "@@odata.type": "microsoft.graph.assignmentRequestApprovalStageCallbackData",
+                            "approvalStage": {
+                                "durationBeforeAutomaticDenial": "P2D",
+                                "escalationApprovers": [],
+                                "fallbackEscalationApprovers": [],
+                                "fallbackPrimaryApprovers": [],
+                                "isApproverJustificationRequired": false,
+                                "isEscalationEnabled": false,
+                                "primaryApprovers": [
+                                    {
+                                        "@@odata.type": "#microsoft.graph.singleUser",
+                                        "description": "Company code approver",
+                                        "id": "@{body('Parse_User_Graph_response')?['id']}",
+                                        "isBackup": false
+                                    }
+                                ]
+                            },
+                            "customExtensionStageInstanceDetail": "Approval stage",
+                            "customExtensionStageInstanceId": "@{triggerBody()?['CustomExtensionStageInstanceId']}",
+                            "stage": "assignmentRequestDeterminingApprovalRequirements"
+                        },
+                        "source": "BestRun",
+                        "type": "microsoft.graph.accessPackageCustomExtensionStage.assignmentRequestCreated"
+                    },
+                    "authentication": {
+                        "type": "ManagedServiceIdentity",
+                        "audience": "https://graph.microsoft.com"
+                    }
+                },
+                "operationOptions": "DisableAsyncPattern",
+                "runtimeConfiguration": {
+                    "contentTransfer": {
+                        "transferMode": "Chunked"
+                    }
+                }
+            }
+        },
+        "outputs": {},
+        "parameters": {
+            "$connections": {
+                "type": "Object",
+                "defaultValue": {}
+            }
+        }
+    },
+    "parameters": {
+        "$connections": {
+            "type": "Object",
+            "value": {}
+        }
+    }
+}

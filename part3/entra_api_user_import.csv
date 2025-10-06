@@ -1,0 +1,3 @@
+﻿STATUS;USERID;USERNAME;FIRSTNAME;NICKNAME;MI;LASTNAME;SUFFIX;TITLE;GENDER;EMAIL;MANAGER;HR;DEPARTMENT;JOBCODE;DIVISION;LOCATION;TIMEZONE;HIREDATE
+STATUS;USERID;Username;First Name;Nickname;Middle Name;Last Name;Suffix;Title;Gender;Email;Manager;Human Resource;Department;Job Code;Division;Location;Time Zone;Hire Date
+active;entra_provisioning_user;entra_provisioning_user;entra;;;entra provisioning;;;F;entra_provisioning_user@bestruncorp.onmicrosoft.com;NO_MANAGER;NO_HR;;;;;;
